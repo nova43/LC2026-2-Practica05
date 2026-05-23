@@ -126,27 +126,17 @@ aux2 s (r:rs) =
 
 --Funcion que devuelve un umg de una lista de termino, si es que lo hay
 unificaConj :: [Term] -> [Subst]
-
 unificaConj [] = [[]]
-
 unificaConj [x] = [[]]
+unificaConj (x:xs) =
+    auxConj x xs []
 
-unificaConj (x:y:xs) =
-    auxConj (unifica x y) xs
+auxConj :: Term -> [Term] -> Subst -> [Subst]
+auxConj _ [] s = [s]
+auxConj x (y:xs) s =
+    auxConj2 (apsubT x s) xs s (unifica (apsubT x s) (apsubT y s))
 
-
-auxConj :: [Subst] -> [Term] -> [Subst]
-
-auxConj [] xs = []
-
-auxConj (s:ss) xs =
-    auxConj2 s
-        (unificaConj (aplicarLista xs s))
-
-
-auxConj2 :: Subst -> [Subst] -> [Subst]
-
-auxConj2 s [] = []
-
-auxConj2 s (r:rs) =
-    [compSus s r]
+auxConj2 :: Term -> [Term] -> Subst -> [Subst] -> [Subst]
+auxConj2 _ _ _ [] = []
+auxConj2 x' xs s [u] = auxConj x' xs (compSus s u)
+auxConj2 _ _ _ _ = []
